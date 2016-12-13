@@ -16,6 +16,8 @@ NixTrayWidget::NixTrayWidget(QWidget *parent) :
 
     CHANNEL = settings.value("channel", "nixos-unstable").toString();
 
+    createMenu();
+
     program = "nixos-version";
     arguments << "--revision";
 
@@ -37,12 +39,36 @@ NixTrayWidget::NixTrayWidget(QWidget *parent) :
     // Left click
     connect(systray, &QSystemTrayIcon::activated, this, &NixTrayWidget::onActivated);
 
-
 }
 
 void NixTrayWidget::execute()
 {
     nixosVersionCmd->start(program, arguments);
+}
+
+void NixTrayWidget::createMenu()
+{
+    unstableAction = new QAction("nixos-unstable", this);
+    unstableAction->setCheckable(true);
+
+    stableAction = new QAction("nixos-16.09", this);
+    stableAction->setCheckable(true);
+
+    channelGroup = new QActionGroup(this);
+    channelGroup->addAction(unstableAction);
+    channelGroup->addAction(stableAction);
+
+    channelMenu = new QMenu(this);
+    channelMenu->addAction(unstableAction);
+    channelMenu->addAction(stableAction);
+
+
+    if (CHANNEL == unstableAction->text()) {
+        unstableAction->setChecked(true);
+    }
+
+    systray->setContextMenu(channelMenu);
+    systray->show();
 }
 
 void NixTrayWidget::readyReadStandardOutput()
@@ -83,7 +109,7 @@ void NixTrayWidget::downloadFinished(QNetworkReply *reply)
                 systray->setToolTip("Up to date\n" + CHANNEL + " channel age: " + lastUpdate);
                 systray->setIcon(QIcon::fromTheme("update-none"));
             } else {
-                systray->setToolTip(CHANNEL + " update available: " + lastUpdate);
+                systray->setToolTip(CHANNEL + " update available:\n" + lastUpdate);
                 systray->setIcon(QIcon::fromTheme("update-low"));
             }
         }

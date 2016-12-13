@@ -58,6 +58,11 @@ private:
     QString program;
     QStringList arguments;
 
+    QMenu *channelMenu;
+    QAction *unstableAction;
+    QAction *stableAction;
+    QActionGroup *channelGroup;
+
     QString mOutputString;
     QString currentRevision;
     QString availableRevision;
@@ -68,6 +73,7 @@ private:
 public slots:
     void onActivated(QSystemTrayIcon::ActivationReason reason);
     void execute();
+    void createMenu();
     void sslErrors(const QList<QSslError> &errors);
     void downloadFinished(QNetworkReply *reply);
     void readyReadStandardOutput();
