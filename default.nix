@@ -5,6 +5,7 @@ with import <nixpkgs> {}; {
     buildInputs = [
       qtcreator
       qt5.full
+      gdb
     ];
   };
 }
